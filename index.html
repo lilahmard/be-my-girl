@@ -104,6 +104,101 @@
             }
         }
 
+        /* --- Mobile Responsive & Animations --- */
+        .pulse-music {
+            animation: pulseBtn 2s infinite alternate;
+            background: #ffe3eb !important;
+            border-color: #e91e63 !important;
+        }
+
+        @keyframes pulseBtn {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(233, 30, 99, 0.2);
+            }
+
+            100% {
+                transform: scale(1.15);
+                box-shadow: 0 4px 25px rgba(233, 30, 99, 0.6);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+                /* Prevent top cut-off on small screens */
+                padding-top: 10vh;
+                /* Add some space at the top */
+                min-height: -webkit-fill-available;
+            }
+
+            .card {
+                padding: 30px 20px !important;
+                border-radius: 20px !important;
+                margin: 0 auto;
+                width: 95%;
+                /* Make it slightly wider on very small screens */
+            }
+
+            .title {
+                font-size: 1.6rem !important;
+            }
+
+            .humor-text {
+                font-size: 0.95rem !important;
+                margin-bottom: 15px;
+            }
+
+            .dancing-img,
+            .sad-img,
+            .celebrate-img {
+                width: 140px !important;
+                height: 140px !important;
+                margin-bottom: 10px !important;
+            }
+
+            .btn {
+                padding: 12px 20px !important;
+                font-size: 0.95rem !important;
+            }
+
+            .btn-yes {
+                font-size: 1rem !important;
+            }
+
+            .grow-yes {
+                animation: growBtnMobile 0.5s forwards !important;
+            }
+
+            .music-btn {
+                top: 10px !important;
+                right: 10px !important;
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1rem !important;
+            }
+
+            .celebrate-title {
+                font-size: 2rem !important;
+            }
+
+            .big-emoji {
+                font-size: 3rem !important;
+                margin: 5px auto !important;
+            }
+
+            .btn-group {
+                gap: 10px !important;
+            }
+        }
+
+        @keyframes growBtnMobile {
+            to {
+                transform: scale(1.15);
+                padding: 15px 30px;
+            }
+        }
+
         /* Main Card */
         .card {
             position: relative;
@@ -115,8 +210,20 @@
             max-width: 520px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(233, 30, 99, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-            animation: cardEntrance 1s ease-out;
+            box-shadow: 0 20px 60px rgba(233, 30, 99, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            animation: cardEntrance 1s ease-out, cardFloat 4s ease-in-out infinite alternate 1s;
+        }
+
+        @keyframes cardFloat {
+            0% {
+                transform: translateY(0);
+                box-shadow: 0 20px 60px rgba(233, 30, 99, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            }
+
+            100% {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 70px rgba(233, 30, 99, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.7) inset;
+            }
         }
 
         @keyframes cardEntrance {
@@ -644,7 +751,13 @@
     <!-- Confetti Canvas -->
     <canvas id="confetti-canvas"></canvas>
 
-    <!-- Background Music - Using Web Audio API for a cute melody -->
+    <!-- Romantic Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="romantic.mp3" type="audio/mpeg">
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Scripts -->
     <script>
         // ========== BACKGROUND HEARTS ==========
         function createFloatingHearts() {
@@ -678,74 +791,29 @@
         }
         addSparkles();
 
-        // ========== MUSIC (Web Audio API cute melody) ==========
-        let audioCtx = null;
+        // ========== MUSIC (Romantic Audio File) ==========
         let musicPlaying = false;
-        let musicInterval = null;
-
-        function createMelody() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-            const notes = [
-                { freq: 523.25, dur: 0.3 },  // C5
-                { freq: 587.33, dur: 0.3 },  // D5
-                { freq: 659.25, dur: 0.3 },  // E5
-                { freq: 523.25, dur: 0.3 },  // C5
-                { freq: 659.25, dur: 0.3 },  // E5
-                { freq: 698.46, dur: 0.3 },  // F5
-                { freq: 659.25, dur: 0.6 },  // E5
-                { freq: 587.33, dur: 0.3 },  // D5
-                { freq: 523.25, dur: 0.3 },  // C5
-                { freq: 493.88, dur: 0.3 },  // B4
-                { freq: 523.25, dur: 0.3 },  // C5
-                { freq: 587.33, dur: 0.3 },  // D5
-                { freq: 523.25, dur: 0.6 },  // C5
-                { freq: 0, dur: 0.3 },        // rest
-                { freq: 659.25, dur: 0.3 },  // E5
-                { freq: 698.46, dur: 0.3 },  // F5
-                { freq: 783.99, dur: 0.3 },  // G5
-                { freq: 783.99, dur: 0.3 },  // G5
-                { freq: 698.46, dur: 0.3 },  // F5
-                { freq: 659.25, dur: 0.3 },  // E5
-                { freq: 523.25, dur: 0.3 },  // C5
-                { freq: 587.33, dur: 0.3 },  // D5
-                { freq: 659.25, dur: 0.3 },  // E5
-                { freq: 587.33, dur: 0.6 },  // D5
-                { freq: 523.25, dur: 0.6 },  // C5
-            ];
-
-            let time = audioCtx.currentTime;
-            notes.forEach(note => {
-                if (note.freq > 0) {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = note.freq;
-                    gain.gain.setValueAtTime(0.08, time);
-                    gain.gain.exponentialRampToValueAtTime(0.001, time + note.dur);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(time);
-                    osc.stop(time + note.dur);
-                }
-                time += note.dur;
-            });
-            return time - audioCtx.currentTime;
-        }
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.5; // Sweet romantic volume
 
         function startMusic() {
             musicPlaying = true;
-            document.getElementById('musicBtn').textContent = '🔊';
-            const totalTime = createMelody();
-            musicInterval = setInterval(() => {
-                if (musicPlaying) createMelody();
-            }, totalTime * 1000);
+            const btn = document.getElementById('musicBtn');
+            btn.textContent = '🎶';
+            btn.classList.add('pulse-music');
+
+            // Play the romantic audio file
+            bgMusic.play().catch(e => {
+                console.log("Waiting for user to add romantic.mp3!", e);
+            });
         }
 
         function stopMusic() {
             musicPlaying = false;
-            document.getElementById('musicBtn').textContent = '🔇';
-            if (musicInterval) clearInterval(musicInterval);
+            const btn = document.getElementById('musicBtn');
+            btn.textContent = '🔇';
+            btn.classList.remove('pulse-music');
+            bgMusic.pause();
         }
 
         function toggleMusic() {
@@ -801,11 +869,8 @@
         function handleYes() {
             showScreen(7);
             startCelebration();
-            // Play victory melody
-            if (audioCtx) {
-                stopMusic();
-                setTimeout(() => playVictoryMelody(), 300);
-            }
+            // Ensure the romantic song is playing for this moment!
+            if (!musicPlaying) startMusic();
         }
 
         // ========== CELEBRATION ==========
@@ -911,41 +976,7 @@
             }, 3000);
         }
 
-        // ========== VICTORY MELODY ==========
-        function playVictoryMelody() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-            const notes = [
-                { freq: 523.25, dur: 0.15 },
-                { freq: 587.33, dur: 0.15 },
-                { freq: 659.25, dur: 0.15 },
-                { freq: 783.99, dur: 0.15 },
-                { freq: 880.00, dur: 0.15 },
-                { freq: 783.99, dur: 0.15 },
-                { freq: 880.00, dur: 0.15 },
-                { freq: 1046.50, dur: 0.5 },
-                { freq: 0, dur: 0.2 },
-                { freq: 880.00, dur: 0.2 },
-                { freq: 1046.50, dur: 0.6 },
-            ];
-
-            let time = audioCtx.currentTime;
-            notes.forEach(note => {
-                if (note.freq > 0) {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.value = note.freq;
-                    gain.gain.setValueAtTime(0.12, time);
-                    gain.gain.exponentialRampToValueAtTime(0.001, time + note.dur);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(time);
-                    osc.stop(time + note.dur);
-                }
-                time += note.dur;
-            });
-        }
+        // Handled entirely by background music now
 
         // Handle window resize for confetti canvas
         window.addEventListener('resize', () => {
